@@ -3,6 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_quill_delta_from_html/parser/pullquote_block_example.dart';
 import 'package:flutter_quill_delta_from_html/flutter_quill_delta_from_html.dart';
 
+/*
+* Use this page to generate html and delta: https://quilljs.com/docs/delta. It's possible to use Delta.fromJson().
+* to convert from the json delta into the dart representation.
+*
+* */
+
 void main() {
   group('HtmlToDelta tests', () {
     test('Header with styles', () {
@@ -24,8 +30,7 @@ void main() {
     });
 
     test('Paragraph with link', () {
-      const html =
-          '<p>This is a <a href="https://example.com">link</a> to example.com</p>';
+      const html = '<p>This is a <a href="https://example.com">link</a> to example.com</p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -52,14 +57,10 @@ void main() {
     });
 
     test('Paragraph with different font-size unit type', () {
-      const htmlSmall =
-          '<p style="font-size: 0.75em">This is a paragraph example</p>';
-      const htmlHuge =
-          '<p style="font-size: 2.5em">This is a paragraph example 2</p>';
-      const htmlLarge =
-          '<p style="font-size: 1.5em">This is a paragraph example 3</p>';
-      const htmlCustomSize =
-          '<p style="font-size: 12pt">This is a paragraph example 4</p>';
+      const htmlSmall = '<p style="font-size: 0.75em">This is a paragraph example</p>';
+      const htmlHuge = '<p style="font-size: 2.5em">This is a paragraph example 2</p>';
+      const htmlLarge = '<p style="font-size: 1.5em">This is a paragraph example 3</p>';
+      const htmlCustomSize = '<p style="font-size: 12pt">This is a paragraph example 4</p>';
       final converter = HtmlToDelta();
       final deltaSmall = converter.convert(htmlSmall);
       final deltaLarge = converter.convert(htmlLarge);
@@ -102,14 +103,12 @@ void main() {
     });
 
     test('Paragraph alignment RTL with inline styles', () {
-      const html =
-          '<p align="center" dir="rtl" style="line-height: 1.5px;font-size: 15px;font-family: Tinos">This is a paragraph example</p>';
+      const html = '<p align="center" dir="rtl" style="line-height: 1.5px;font-size: 15px;font-family: Tinos">This is a paragraph example</p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
       final expectedDelta = Delta()
-        ..insert('This is a paragraph example',
-            {"line-height": 1.5, "size": "15", "font": "Tinos"})
+        ..insert('This is a paragraph example', {"line-height": 1.5, "size": "15", "font": "Tinos"})
         ..insert('\n', {"align": "center", "direction": "rtl"})
         ..insert('\n');
 
@@ -117,8 +116,7 @@ void main() {
     });
 
     test('Paragraph with spanned red text', () {
-      const html =
-          '<p>This is a <span style="background-color:rgb(255,255,255)">red text</span></p>';
+      const html = '<p>This is a <span style="background-color:rgb(255,255,255)">red text</span></p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -131,8 +129,7 @@ void main() {
     });
 
     test('Paragraph with subscript and superscript', () {
-      const html =
-          '<p>This is a paragraph that contains <sub>subscript</sub> and <sup>superscript</sup></p>';
+      const html = '<p>This is a paragraph that contains <sub>subscript</sub> and <sup>superscript</sup></p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -147,15 +144,13 @@ void main() {
     });
 
     test('Paragraph with a image child', () {
-      const html =
-          '<p>This is an image: <img align="center" style="width: 50px;height: 250px;margin: 5px;" src="https://example.com/image.png"/> example</p>';
+      const html = '<p>This is an image: <img align="center" style="width: 50px;height: 250px;margin: 5px;" src="https://example.com/image.png"/> example</p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
       final expectedDelta = Delta()
         ..insert('This is an image: ')
-        ..insert({'image': 'https://example.com/image.png'},
-            {"style": "width:50px;height:250px;margin:5px;alignment:center"})
+        ..insert({'image': 'https://example.com/image.png'}, {"style": "width:50px;height:250px;margin:5px;alignment:center"})
         ..insert(' example')
         ..insert('\n');
 
@@ -176,10 +171,215 @@ void main() {
 
       expect(delta, expectedDelta);
     });
+    test('2 list', () {
+      const html = '<ol><li>First item</li><li>Second item</li></ol><ul><li>First item</li><li>Second item</li></ul>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
 
-    test('Nested list', () {
+      final expectedDelta = Delta()
+        ..insert('First item')
+        ..insert('\n', {'list': 'ordered'})
+        ..insert('Second item')
+        ..insert('\n', {'list': 'ordered'})
+        ..insert('First item')
+        ..insert('\n', {'list': 'bullet'})
+        ..insert('Second item')
+        ..insert('\n', {'list': 'bullet'})
+        ..insert('\n');
+      expect(delta, expectedDelta);
+    });
+
+    test('More List', () {
       const html =
-          '<ol><li>First <strong>item</strong><ul><li>SubItem <a href="https://www.google.com">1</a><ol><li>Sub 1.5</li></ol></li><li>SubItem 2</li></ul></li><li>Second item</li></ol>';
+          '<ol><li data-list="ordered"><span class="ql-ui" contenteditable="false"></span>First item</li><li data-list="ordered"><span class="ql-ui" contenteditable="false"></span>Second item</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>First item</li><li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>Second item</li></ol>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
+
+      final expectedDelta = Delta()
+        ..insert('First item')
+        ..insert('\n', {'list': 'ordered'})
+        ..insert('Second item')
+        ..insert('\n', {'list': 'ordered'})
+        ..insert('First item')
+        ..insert('\n', {'list': 'bullet'})
+        ..insert('Second item')
+        ..insert('\n', {'list': 'bullet'})
+        ..insert('\n');
+      expect(delta, expectedDelta);
+    });
+    test('More List 2', () {
+      const html =
+          '<ol>'
+          '<li data-list="unchecked"><span class="ql-ui" contenteditable="false"></span>unchecked</li>'
+          '<li data-list="checked"><span class="ql-ui" contenteditable="false"></span>checked</li>'
+          '<li data-list="unchecked"><span class="ql-ui" contenteditable="false"></span><br></li>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>item x</li>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>item y</li>'
+          '<li data-list="ordered"><span class="ql-ui" contenteditable="false"></span>first</li>'
+          '<li data-list="ordered"><span class="ql-ui" contenteditable="false"></span>second</li>'
+          '</ol>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
+
+      final expectedDelta = Delta.fromJson([
+        {
+          "insert": "unchecked"
+        },
+        {
+          "attributes": {
+            "list": "unchecked"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "checked"
+        },
+        {
+          "attributes": {
+            "list": "checked"
+          },
+          "insert": "\n"
+        },
+        {
+          "attributes": {
+            "list": "unchecked"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "item x"
+        },
+        {
+          "attributes": {
+            "list": "bullet"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "item y"
+        },
+        {
+          "attributes": {
+            "list": "bullet"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "first"
+        },
+        {
+          "attributes": {
+            "list": "ordered"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "second"
+        },
+        {
+          "attributes": {
+            "list": "ordered"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "\n"
+        }
+      ]);
+
+      expect(delta, expectedDelta);
+    });
+    test('More List (old format)', () {
+      const html =
+          '<ul data-checked="false">'
+          '<li>unchecked</li></ul>'
+          '<ul data-checked="true">'
+          '<li>checked</li>'
+          '</ul>'
+          '<ul>'
+          '<li>x</li>'
+          '<li>y</li>'
+          '</ul>'
+          '<ol>'
+          '<li>unos</li>'
+          '<li>dos</li>'
+          '<li><br></li>'
+          '</ol>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
+
+      final expectedDelta = Delta.fromJson([
+        {
+          "insert": "unchecked"
+        },
+        {
+          "attributes": {
+            "list": "unchecked"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "checked"
+        },
+        {
+          "attributes": {
+            "list": "checked"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "x"
+        },
+        {
+          "attributes": {
+            "list": "bullet"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "y"
+        },
+        {
+          "attributes": {
+            "list": "bullet"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "unos"
+        },
+        {
+          "attributes": {
+            "list": "ordered"
+          },
+          "insert": "\n"
+        },
+        {
+          "insert": "dos"
+        },
+        {
+          "attributes": {
+            "list": "ordered"
+          },
+          "insert": "\n\n"
+        },
+        {
+          "insert": "\n"
+        }
+      ]);
+
+      expect(delta, expectedDelta);
+    });
+
+    //
+    test('Nested list', () {
+      const html = '<ol>'
+          '<li>First <strong>item</strong><ul>'
+          '<li>SubItem <a href="https://www.google.com">1</a><ol>'
+          '<li>Sub 1.5</li></ol></li>'
+          '<li>SubItem 2</li></ul></li>'
+          '<li>Second item</li>'
+          '</ol>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -203,7 +403,9 @@ void main() {
 
     test('Complex Nested list', () {
       const html =
-          """<ul><li>List item one </li><li>List item two with subitems: <ul><li>Subitem 1</li><li>Subitem 2</li></ul></li><li>Final list item</li></ul>""";
+          """<ul>
+          <li>List item one </li>
+          <li>List item two with subitems: <ul><li>Subitem 1</li><li>Subitem 2</li></ul></li><li>Final list item</li></ul>""";
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -222,7 +424,7 @@ void main() {
 
       expect(delta, expectedDelta);
     });
-
+    //
     test('Checklist', () {
       const html =
           '<ul><li data-checked="true">First item</li><li data-checked="false">Second item</li></ul>';
@@ -240,8 +442,7 @@ void main() {
     });
 
     test('Image', () {
-      const html =
-          '<p>This is an image:</p><img src="https://example.com/image.png" />';
+      const html = '<p>This is an image:</p><img src="https://example.com/image.png" />';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -254,15 +455,13 @@ void main() {
     });
 
     test('Image with styles', () {
-      const html =
-          '<p>This is an image:</p><img align="center" style="width: 50px;height: 250px;margin: 5px;" src="https://example.com/image.png" />';
+      const html = '<p>This is an image:</p><img align="center" style="width: 50px;height: 250px;margin: 5px;" src="https://example.com/image.png" />';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
       final expectedDelta = Delta()
         ..insert('This is an image:')
-        ..insert({'image': 'https://example.com/image.png'},
-            {"style": "width:50px;height:250px;margin:5px;alignment:center"})
+        ..insert({'image': 'https://example.com/image.png'}, {"style": "width:50px;height:250px;margin:5px;alignment:center"})
         ..insert('\n');
 
       expect(delta, expectedDelta);
@@ -295,8 +494,7 @@ void main() {
     });
 
     test('Text with different styles', () {
-      const html =
-          '<p>This is <strong>bold</strong>, <em>italic</em>, and <u>underlined</u> text.</p>';
+      const html = '<p>This is <strong>bold</strong>, <em>italic</em>, and <u>underlined</u> text.</p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -314,8 +512,7 @@ void main() {
     });
 
     test('Combined styles and link', () {
-      const html =
-          '<p>This is a <strong><a href="https://example.com">bold link</a></strong> with text.</p>';
+      const html = '<p>This is a <strong><a href="https://example.com">bold link</a></strong> with text.</p>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -329,9 +526,7 @@ void main() {
     });
   });
 
-  test(
-      'should convert custom <pullquote> block to Delta with custom attributes',
-      () {
+  test('should convert custom <pullquote> block to Delta with custom attributes', () {
     const htmlText = '''
         <html>
           <body>
@@ -349,8 +544,7 @@ void main() {
 
     final expectedDelta = Delta()
       ..insert('Regular paragraph before the custom block')
-      ..insert('Pullquote: "This is a custom pullquote" by John Doe',
-          {'italic': true})
+      ..insert('Pullquote: "This is a custom pullquote" by John Doe', {'italic': true})
       ..insert('\n')
       ..insert('Regular paragraph after the custom block\n');
 
@@ -391,8 +585,7 @@ void main() {
   });
 
   test('Paragraph with colors', () {
-    const html =
-        '<p><span style="color:#F06292FF">This is just pink </span><br/><br/><span style="color:#4DD0E1FF">This is just blue</span></p>';
+    const html = '<p><span style="color:#F06292FF">This is just pink </span><br/><br/><span style="color:#4DD0E1FF">This is just blue</span></p>';
 
     final converter = HtmlToDelta();
     final delta = converter.convert(html);

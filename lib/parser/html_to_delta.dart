@@ -247,7 +247,11 @@ class HtmlToDelta {
       }
       List<Operation> ops = htmlToOp.resolveCurrentElement(node);
       operations.addAll(ops);
-      if (nextIsBlock) operations.add(Operation.insert('\n'));
+       if (nextIsBlock) {
+         //operations.add(Operation.insert('\n'));
+         // todo ^ maybe this has to be removed
+       }
+
     }
 
     return operations;
