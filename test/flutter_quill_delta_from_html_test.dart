@@ -393,6 +393,43 @@ void main() {
           "attributes": {"list": "bullet", "indent": 6},
           "insert": "\n"
         },
+        {"insert": "\n"}
+      ]);
+
+      expect(delta, expectedDelta);
+    });
+
+    test('Nested list with indent attribute and reset', () {
+      const html = '<ol>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>lev1</li>'
+          '<li data-list="bullet" class="ql-indent-1"><span class="ql-ui" contenteditable="false"></span>lev2</li>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>lev1</li>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>lev1 again</li>'
+          '</ol>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
+
+      final expectedDelta = Delta.fromJson([
+        {"insert": "lev1"},
+        {
+          "attributes": {"list": "bullet"},
+          "insert": "\n"
+        },
+        {"insert": "lev2"},
+        {
+          "attributes": {"indent": 1, "list": "bullet"},
+          "insert": "\n"
+        },
+        {"insert": "lev1"},
+        {
+          "attributes": {"list": "bullet"},
+          "insert": "\n"
+        },
+        {"insert": "lev1 again"},
+        {
+          "attributes": {"list": "bullet"},
+          "insert": "\n"
+        },
         {
           "insert": "\n"
         }

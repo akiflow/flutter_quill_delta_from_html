@@ -222,18 +222,22 @@ class DefaultHtmlToOperations extends HtmlOperations {
 
       final liClasses = item.getSafeAttribute('class');
       int finalIndentLevel = indentLevel;
-      if(liClasses.contains('ql-indent-1')) finalIndentLevel+=1;
-      if(liClasses.contains('ql-indent-2')) finalIndentLevel+=2;
-      if(liClasses.contains('ql-indent-3')) finalIndentLevel+=3;
-      if(liClasses.contains('ql-indent-4')) finalIndentLevel+=4;
-      if(liClasses.contains('ql-indent-5')) finalIndentLevel+=5;
-      if(liClasses.contains('ql-indent-6')) finalIndentLevel+=6;
-      if(liClasses.contains('ql-indent-7')) finalIndentLevel+=7;
-      if(liClasses.contains('ql-indent-8')) finalIndentLevel+=8;
+      if (liClasses.contains('ql-indent-1')) finalIndentLevel += 1;
+      if (liClasses.contains('ql-indent-2')) finalIndentLevel += 2;
+      if (liClasses.contains('ql-indent-3')) finalIndentLevel += 3;
+      if (liClasses.contains('ql-indent-4')) finalIndentLevel += 4;
+      if (liClasses.contains('ql-indent-5')) finalIndentLevel += 5;
+      if (liClasses.contains('ql-indent-6')) finalIndentLevel += 6;
+      if (liClasses.contains('ql-indent-7')) finalIndentLevel += 7;
+      if (liClasses.contains('ql-indent-8')) finalIndentLevel += 8;
 
       // force always the max level indentation to be five
       if (finalIndentLevel > 9) finalIndentLevel = 9;
-      if (finalIndentLevel > 0) attributes['indent'] = finalIndentLevel;
+      if (finalIndentLevel > 0) {
+        attributes['indent'] = finalIndentLevel;
+      } else {
+        attributes.remove('indent');
+      }
       for (final node in item.nodes) {
         if (node.nodeType == dom.Node.TEXT_NODE) {
           // if (node.text != '') {
