@@ -208,8 +208,7 @@ void main() {
       expect(delta, expectedDelta);
     });
     test('More List 2', () {
-      const html =
-          '<ol>'
+      const html = '<ol>'
           '<li data-list="unchecked"><span class="ql-ui" contenteditable="false"></span>unchecked</li>'
           '<li data-list="checked"><span class="ql-ui" contenteditable="false"></span>checked</li>'
           '<li data-list="unchecked"><span class="ql-ui" contenteditable="false"></span><br></li>'
@@ -222,76 +221,47 @@ void main() {
       final delta = converter.convert(html);
 
       final expectedDelta = Delta.fromJson([
+        {"insert": "unchecked"},
         {
-          "insert": "unchecked"
+          "attributes": {"list": "unchecked"},
+          "insert": "\n"
         },
+        {"insert": "checked"},
         {
-          "attributes": {
-            "list": "unchecked"
-          },
+          "attributes": {"list": "checked"},
           "insert": "\n"
         },
         {
-          "insert": "checked"
-        },
-        {
-          "attributes": {
-            "list": "checked"
-          },
+          "attributes": {"list": "unchecked"},
           "insert": "\n"
         },
+        {"insert": "item x"},
         {
-          "attributes": {
-            "list": "unchecked"
-          },
+          "attributes": {"list": "bullet"},
           "insert": "\n"
         },
+        {"insert": "item y"},
         {
-          "insert": "item x"
-        },
-        {
-          "attributes": {
-            "list": "bullet"
-          },
+          "attributes": {"list": "bullet"},
           "insert": "\n"
         },
+        {"insert": "first"},
         {
-          "insert": "item y"
-        },
-        {
-          "attributes": {
-            "list": "bullet"
-          },
+          "attributes": {"list": "ordered"},
           "insert": "\n"
         },
+        {"insert": "second"},
         {
-          "insert": "first"
-        },
-        {
-          "attributes": {
-            "list": "ordered"
-          },
+          "attributes": {"list": "ordered"},
           "insert": "\n"
         },
-        {
-          "insert": "second"
-        },
-        {
-          "attributes": {
-            "list": "ordered"
-          },
-          "insert": "\n"
-        },
-        {
-          "insert": "\n"
-        }
+        {"insert": "\n"}
       ]);
 
       expect(delta, expectedDelta);
     });
     test('More List (old format)', () {
-      const html =
-          '<ul data-checked="false">'
+      const html = '<ul data-checked="false">'
           '<li>unchecked</li></ul>'
           '<ul data-checked="true">'
           '<li>checked</li>'
@@ -309,63 +279,37 @@ void main() {
       final delta = converter.convert(html);
 
       final expectedDelta = Delta.fromJson([
+        {"insert": "unchecked"},
         {
-          "insert": "unchecked"
-        },
-        {
-          "attributes": {
-            "list": "unchecked"
-          },
+          "attributes": {"list": "unchecked"},
           "insert": "\n"
         },
+        {"insert": "checked"},
         {
-          "insert": "checked"
-        },
-        {
-          "attributes": {
-            "list": "checked"
-          },
+          "attributes": {"list": "checked"},
           "insert": "\n"
         },
+        {"insert": "x"},
         {
-          "insert": "x"
-        },
-        {
-          "attributes": {
-            "list": "bullet"
-          },
+          "attributes": {"list": "bullet"},
           "insert": "\n"
         },
+        {"insert": "y"},
         {
-          "insert": "y"
-        },
-        {
-          "attributes": {
-            "list": "bullet"
-          },
+          "attributes": {"list": "bullet"},
           "insert": "\n"
         },
+        {"insert": "unos"},
         {
-          "insert": "unos"
-        },
-        {
-          "attributes": {
-            "list": "ordered"
-          },
+          "attributes": {"list": "ordered"},
           "insert": "\n"
         },
+        {"insert": "dos"},
         {
-          "insert": "dos"
-        },
-        {
-          "attributes": {
-            "list": "ordered"
-          },
+          "attributes": {"list": "ordered"},
           "insert": "\n\n"
         },
-        {
-          "insert": "\n"
-        }
+        {"insert": "\n"}
       ]);
 
       expect(delta, expectedDelta);
@@ -400,10 +344,65 @@ void main() {
 
       expect(delta, expectedDelta);
     });
+    test('Nested list with indent attribute', () {
+      const html = '<ol>'
+          '<li data-list="bullet"><span class="ql-ui" contenteditable="false"></span>lev1</li>'
+          '<li data-list="bullet" class="ql-indent-1"><span class="ql-ui" contenteditable="false"></span>lev2</li>'
+          '<li data-list="bullet" class="ql-indent-2"><span class="ql-ui" contenteditable="false"></span>lev3</li>'
+          '<li data-list="bullet" class="ql-indent-3"><span class="ql-ui" contenteditable="false"></span>lev4</li>'
+          '<li data-list="bullet" class="ql-indent-4"><span class="ql-ui" contenteditable="false"></span>lev5</li>'
+          '<li data-list="bullet" class="ql-indent-5"><span class="ql-ui" contenteditable="false"></span>lev6</li>'
+          '<li data-list="bullet" class="ql-indent-6"><span class="ql-ui" contenteditable="false"></span>lev7</li>'
+          '</ol>';
+      final converter = HtmlToDelta();
+      final delta = converter.convert(html);
+
+      final expectedDelta = Delta.fromJson([
+        {"insert": "lev1"},
+        {
+          "attributes": {"list": "bullet"},
+          "insert": "\n"
+        },
+        {"insert": "lev2"},
+        {
+          "attributes": {"list": "bullet", "indent": 1},
+          "insert": "\n"
+        },
+        {"insert": "lev3"},
+        {
+          "attributes": {"list": "bullet", "indent": 2},
+          "insert": "\n"
+        },
+        {"insert": "lev4"},
+        {
+          "attributes": {"list": "bullet", "indent": 3},
+          "insert": "\n"
+        },
+        {"insert": "lev5"},
+        {
+          "attributes": {"list": "bullet", "indent": 4},
+          "insert": "\n"
+        },
+        {"insert": "lev6"},
+        {
+          "attributes": {"list": "bullet", "indent": 5},
+          "insert": "\n"
+        },
+        {"insert": "lev7"},
+        {
+          "attributes": {"list": "bullet", "indent": 6},
+          "insert": "\n"
+        },
+        {
+          "insert": "\n"
+        }
+      ]);
+
+      expect(delta, expectedDelta);
+    });
 
     test('Complex Nested list', () {
-      const html =
-          """<ul>
+      const html = """<ul>
           <li>List item one </li>
           <li>List item two with subitems: <ul><li>Subitem 1</li><li>Subitem 2</li></ul></li><li>Final list item</li></ul>""";
       final converter = HtmlToDelta();
@@ -426,8 +425,7 @@ void main() {
     });
     //
     test('Checklist', () {
-      const html =
-          '<ul><li data-checked="true">First item</li><li data-checked="false">Second item</li></ul>';
+      const html = '<ul><li data-checked="true">First item</li><li data-checked="false">Second item</li></ul>';
       final converter = HtmlToDelta();
       final delta = converter.convert(html);
 
@@ -552,11 +550,9 @@ void main() {
   });
 
   test('Div with mixed content', () {
-    const html =
-        '<div><p>Paragraph inside div.</p><h1>Header inside div</h1><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
+    const html = '<div><p>Paragraph inside div.</p><h1>Header inside div</h1><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
 
-    const htmlReversed =
-        '<div><h1>Paragraph inside div.</h1><p>Header inside div</p><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
+    const htmlReversed = '<div><h1>Paragraph inside div.</h1><p>Header inside div</p><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
     final converter = HtmlToDelta();
     final delta = converter.convert(html);
     final deltaReversed = converter.convert(htmlReversed);
