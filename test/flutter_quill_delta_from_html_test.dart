@@ -482,7 +482,7 @@ void main() {
       final delta = converter.convert(html);
 
       final expectedDelta = Delta()
-        ..insert('This is an image:')
+        ..insert('This is an image:\n')
         ..insert({'image': 'https://example.com/image.png'})
         ..insert('\n');
 
@@ -495,7 +495,7 @@ void main() {
       final delta = converter.convert(html);
 
       final expectedDelta = Delta()
-        ..insert('This is an image:')
+        ..insert('This is an image:\n')
         ..insert({'image': 'https://example.com/image.png'}, {"style": "width:50px;height:250px;margin:5px;alignment:center"})
         ..insert('\n');
 
@@ -578,7 +578,7 @@ void main() {
     final delta = converter.convert(htmlText);
 
     final expectedDelta = Delta()
-      ..insert('Regular paragraph before the custom block')
+      ..insert('Regular paragraph before the custom block\n')
       ..insert('Pullquote: "This is a custom pullquote" by John Doe', {'italic': true})
       ..insert('\n')
       ..insert('Regular paragraph after the custom block\n');
@@ -587,7 +587,14 @@ void main() {
   });
 
   test('Div with mixed content', () {
-    const html = '<div><p>Paragraph inside div.</p><h1>Header inside div</h1><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
+    const html = '<div>'
+        '<p>Paragraph inside div.</p>'
+        '<h1>Header inside div</h1>'
+        '<ul>'
+        '<li>List item 1</li>'
+        '<li data-checked="false">List item 2</li>'
+        '</ul>'
+        '</div>';
 
     const htmlReversed = '<div><h1>Paragraph inside div.</h1><p>Header inside div</p><ul><li>List item 1</li><li data-checked="false">List item 2</li></ul></div>';
     final converter = HtmlToDelta();
@@ -628,6 +635,59 @@ void main() {
       ..insert('\n\n')
       ..insert("This is just blue", {"color": "#4DD0E1FF"})
       ..insert('\n');
+
+    expect(delta, expectedDelta);
+  });
+
+  test('Multiple paragraph', () {
+    const html = ''
+        '<p>Paragraph</p>'
+        '<p><strong>bold</strong></p>'
+        '<p><em>italic</em></p>'
+        '<p><strong>bold</strong><em>italic</em></p>';
+
+    final converter = HtmlToDelta();
+    final delta = converter.convert(html);
+
+
+    final expectedDelta = Delta.fromJson([
+      {
+        "insert": "Paragraph\n"
+      },
+      {
+        "attributes": {
+          "bold": true
+        },
+        "insert": "bold"
+      },
+      {
+        "insert": "\n"
+      },
+      {
+        "attributes": {
+          "italic": true
+        },
+        "insert": "italic"
+      },
+      {
+        "insert": "\n"
+      },
+      {
+        "attributes": {
+          "bold": true
+        },
+        "insert": "bold"
+      },
+      {
+        "attributes": {
+          "italic": true
+        },
+        "insert": "italic"
+      },
+      {
+        "insert": "\n"
+      }
+    ]);
 
     expect(delta, expectedDelta);
   });

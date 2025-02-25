@@ -101,8 +101,7 @@ class HtmlToDelta {
         .join()
         .removeAllNewLines;
     final Delta delta = Delta();
-    final dom.Document $document =
-        dparser.parse(replaceNormalNewLinesToBr ? parsedText.transformNewLinesToBrTag : parsedText);
+    final dom.Document $document = dparser.parse(replaceNormalNewLinesToBr ? parsedText.transformNewLinesToBrTag : parsedText);
     final dom.Element? $body = $document.body;
     final dom.Element? $html = $document.documentElement;
 
@@ -132,8 +131,7 @@ class HtmlToDelta {
           delta.insert(op.data, op.attributes);
         }
       }
-      final shouldInsertNewLine =
-          shouldInsertANewLine?.call(node is dom.Element ? node.localName ?? 'no-localname' : 'text-node');
+      final shouldInsertNewLine = shouldInsertANewLine?.call(node is dom.Element ? node.localName ?? 'no-localname' : 'text-node');
       if (shouldInsertNewLine != null && shouldInsertNewLine) {
         delta.insert('\n');
       }
@@ -141,10 +139,13 @@ class HtmlToDelta {
     //ensure insert a new line at the final to avoid any conflict with assertions
     final lastOpdata = delta.last;
     final bool lastDataIsNotNewLine = lastOpdata.data.toString() != '\n';
+    final bool lastDataEndsWithNewLine = lastOpdata.data.toString().endsWith('\n');
     final bool hasAttributes = lastOpdata.attributes != null;
-    if (lastDataIsNotNewLine && hasAttributes || lastDataIsNotNewLine || !lastDataIsNotNewLine && hasAttributes) {
+    //if(!lastDataEndsWithNewLine || hasAttributes) {
+    if (!lastDataEndsWithNewLine || hasAttributes) {
       delta.insert('\n');
     }
+    //}
     return delta;
   }
 
@@ -198,8 +199,7 @@ class HtmlToDelta {
           delta.insert(op.data, op.attributes);
         }
       }
-      final shouldInsertNewLine =
-          shouldInsertANewLine?.call(node is dom.Element ? node.localName ?? 'no-localname' : 'text-node');
+      final shouldInsertNewLine = shouldInsertANewLine?.call(node is dom.Element ? node.localName ?? 'no-localname' : 'text-node');
       if (shouldInsertNewLine != null && shouldInsertNewLine) {
         delta.insert('\n');
       }
@@ -247,11 +247,10 @@ class HtmlToDelta {
       }
       List<Operation> ops = htmlToOp.resolveCurrentElement(node);
       operations.addAll(ops);
-       if (nextIsBlock) {
-         //operations.add(Operation.insert('\n'));
-         // todo ^ maybe this has to be removed
-       }
-
+      if (nextIsBlock) {
+        // operations.add(Operation.insert('\n'));
+        // todo ^ maybe this has to be removed
+      }
     }
 
     return operations;

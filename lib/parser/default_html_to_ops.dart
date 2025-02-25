@@ -47,8 +47,10 @@ class DefaultHtmlToOperations extends HtmlOperations {
     if (blockAttributes.isNotEmpty) {
       blockAttributes.removeWhere((key, value) => value == null);
       delta.insert('\n', blockAttributes);
+    }else{
+      delta.insert('\n');
     }
-
+    // print(delta.toList());
     return delta.toList();
   }
 
@@ -151,9 +153,9 @@ class DefaultHtmlToOperations extends HtmlOperations {
         for (final op in ops) {
           delta.insert(op.data, op.attributes);
         }
-        if (node.isParagraph) {
-          delta.insert('\n');
-        }
+        // if (node.isParagraph) {
+        //   delta.insert('\n');
+        // }
       }
     }
 
