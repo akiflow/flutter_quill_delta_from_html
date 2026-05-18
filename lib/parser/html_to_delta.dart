@@ -137,15 +137,14 @@ class HtmlToDelta {
       }
     }
     //ensure insert a new line at the final to avoid any conflict with assertions
-    final lastOpdata = delta.last;
-    final bool lastDataIsNotNewLine = lastOpdata.data.toString() != '\n';
-    final bool lastDataEndsWithNewLine = lastOpdata.data.toString().endsWith('\n');
-    final bool hasAttributes = lastOpdata.attributes != null;
-    //if(!lastDataEndsWithNewLine || hasAttributes) {
-    if (!lastDataEndsWithNewLine || hasAttributes) {
-      delta.insert('\n');
-    }
-    //}
+    if(delta.isNotEmpty) {
+      final lastOpdata = delta.last;
+      final bool lastDataIsNotNewLine = lastOpdata.data.toString() != '\n';
+      final bool lastDataEndsWithNewLine = lastOpdata.data.toString().endsWith('\n');
+      final bool hasAttributes = lastOpdata.attributes != null;
+      if (!lastDataEndsWithNewLine || hasAttributes) {
+        delta.insert('\n');
+      }
     return delta;
   }
 
