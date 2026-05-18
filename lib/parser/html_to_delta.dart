@@ -145,6 +145,7 @@ class HtmlToDelta {
       if (!lastDataEndsWithNewLine || hasAttributes) {
         delta.insert('\n');
       }
+    }
     return delta;
   }
 
